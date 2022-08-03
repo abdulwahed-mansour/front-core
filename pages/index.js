@@ -53,7 +53,7 @@ export default function App() {
             <h1>Sports List</h1>
             <div className="form-group mb-5">
               <label htmlFor="category">Category</label>
-              <select className="form-control" id="category" onChange={handleCategoryChange}>
+              <select className="form-select" id="category" onChange={handleCategoryChange}>
                 <option value="">All</option>
                 <option value="Indoor">Indoor</option>
                 <option value="Outdoor">Outdoor</option>

@@ -1,75 +1,54 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import Products from "../../components/Products";
 
 export default function Product() {
+  const [allProducts, setAllProducts] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [filters, setFilters] = useState({
+    s: "",
+    sort: "",
+    page: 1,
+  });
+  const [lastPage, setLastPage] = useState(0);
+  const perPage = 9;
+
+  useEffect(() => {
+    (async () => {
+      const response = await fetch("/api/data");
+
+      const content = await response.json();
+
+      setAllProducts(content);
+      setFilteredProducts(content.slice(0, filters.page * perPage));
+      setLastPage(Math.ceil(content.length / perPage));
+    })();
+  }, []);
+
+  useEffect(() => {
+    let products = allProducts.filter(
+      (p) =>
+        p.title.toLowerCase().indexOf(filters.s.toLowerCase()) >= 0 ||
+        p.description.toLowerCase().indexOf(filters.s.toLowerCase()) >= 0
+    );
+
+    if (filters.sort === "asc" || filters.sort === "desc") {
+      products.sort((a, b) => {
+        const diff = a.price - b.price;
+
+        if (diff === 0) return 0;
+
+        const sign = Math.abs(diff) / diff; //-1, 1
+
+        return filters.sort === "asc" ? sign : -sign;
+      });
+    }
+
+    setLastPage(Math.ceil(products.length / perPage));
+    setFilteredProducts(products.slice(0, filters.page * perPage));
+  }, [filters]);
   return (
     <>
-      <div className="container mt-3 bg-light text-dark">
-        <div className="row">
-          <div className="col-sm-4 p-3 ">
-            <select className="form-select" id="category">
-              <option value="">All</option>
-              <option value="Indoor">Indoor</option>
-              <option value="Outdoor">Outdoor</option>
-              <option value="Aquatics">Aquatics</option>
-            </select>
-          </div>
-          <div className="col-sm-8 p-3 ">
-            <div className="input-group mb-3">
-              <input type="text" className="form-control" placeholder="Search" />
-              <button className="btn btn-secondary" type="submit">
-                Search
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="container mt-3">
-        <div className="row">
-          <div className="col-sm-4 p-3">
-            <div className="card bg-light text-dark">
-              <div className="card-body">
-                <h4 className="card-title">Product title</h4>
-                <p className="card-text">product category.</p>
-                <a href="#" className="card-link">
-                  Card link
-                </a>
-                <a href="#" className="card-link">
-                  Another link
-                </a>
-              </div>
-            </div>
-          </div>
-          <div className="col-sm-4 p-3">
-            <div className="card bg-light text-dark">
-              <div className="card-body">
-                <h4 className="card-title">Product title</h4>
-                <p className="card-text">product category.</p>
-                <a href="#" className="card-link">
-                  Card link
-                </a>
-                <a href="#" className="card-link">
-                  Another link
-                </a>
-              </div>
-            </div>
-          </div>
-          <div className="col-sm-4 p-3">
-            <div className="card bg-light text-dark">
-              <div className="card-body">
-                <h4 className="card-title">Product title</h4>
-                <p className="card-text">product category.</p>
-                <a href="#" className="card-link">
-                  Card link
-                </a>
-                <a href="#" className="card-link">
-                  Another link
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <Products products={filteredProducts} filters={filters} setFilters={setFilters} lastPage={lastPage} />
     </>
   );
 }

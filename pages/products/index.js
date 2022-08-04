@@ -46,9 +46,5 @@ export default function Product() {
     setLastPage(Math.ceil(products.length / perPage));
     setFilteredProducts(products.slice(0, filters.page * perPage));
   }, [filters]);
-  return (
-    <>
-      <Products products={filteredProducts} filters={filters} setFilters={setFilters} lastPage={lastPage} />
-    </>
-  );
+  return <Products products={filteredProducts} filters={filters} setFilters={setFilters} lastPage={lastPage} />;
 }
